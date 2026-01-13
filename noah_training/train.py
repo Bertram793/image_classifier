@@ -198,3 +198,6 @@ def predict_image(image_path, model, class_dict):
 image_path = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/IMG_4519.jpeg"
 prediction = predict_image(image_path, neural_network, Classes)
 print("Model prediction:", prediction)
+
+
+#
