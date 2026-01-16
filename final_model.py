@@ -10,8 +10,8 @@ from torchvision.datasets import ImageFolder
 import matplotlib.pyplot as plt
 # _______________________________________________________________________________________________________________________________________________________
 # NN-Setup hyper(parameters)
-training_folder = "INPUT FILE LOCATION"
-validation_folder = "INPUT FILE LOCATION"
+training_folder = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/Fruit_classification_data/train"
+validation_folder = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/Fruit_classification_data/valid"
 number_of_epochs = 100
 learning_rate = 0.001
 weight_decay = 0.0001
@@ -183,7 +183,6 @@ for epoch in range(number_of_epochs):
         break
 
 
-# Plot loss functions
 # Plot loss functions
 plt.plot(train_loss, label="Training Loss")
 plt.plot(val_loss, label="Validation Loss")
