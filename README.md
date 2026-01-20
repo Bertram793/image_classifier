@@ -25,4 +25,39 @@ The goal is to identify how resolution choice impacts model performance and prac
 
 ---
 
-## Repository Structure
+## Folder Descriptions
+
+### `experiment/`
+Contains training experiments conducted by each group member.  
+Each subfolder includes scripts, logs, or checkpoints related to individual training runs.
+
+### `final_model.py`
+The finalized CNN model definition used for evaluation and comparison across different image resolutions.
+
+### `architecture (onnx-converter)/`
+Scripts and exported files related to converting the trained model to ONNX format.
+- `export_onnx.py` exports the model
+- `fruit_model_untrained_dynamic.onnx` contains the exported architecture
+
+### `data analysis/`
+Contains Jupyter notebooks and generated figures used for analysis and visualization.
+- Training time vs. accuracy
+- Resolution vs. accuracy
+- Resolution vs. training time
+
+### `graphs/`
+Final plots used in the report.
+
+---
+
+## Requirements
+The project was developed and tested using the following libraries:
+
+- Python 3.x
+- torch
+- torchvision
+- matplotlib
+
+Optional (for analysis and plotting):
+- jupyter
+- numpy
