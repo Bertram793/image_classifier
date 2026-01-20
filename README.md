@@ -44,6 +44,7 @@ Contains Jupyter notebooks and generated figures used for analysis and visualiza
 - Training time vs. accuracy
 - Resolution vs. accuracy
 - Resolution vs. training time
+- CI-intervals for each of the resolutions
 
 ### `graphs/`
 Final plots used in the report.
