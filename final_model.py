@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 # NN-Setup hyper(parameters)
 training_folder = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/Fruit_classification_data/train"
 validation_folder = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/Fruit_classification_data/valid"
-number_of_epochs = 100
+# x-number, will stop with early stoppping, when no improvement in val-loss (patience = 3 eppoch)
+number_of_epochs = 10000
 learning_rate = 0.001
 weight_decay = 0.0001
 x_size, y_size = 32, 32
@@ -99,9 +100,10 @@ neural_network = torch.nn.Sequential(
 # ____________________________________________________________________________________________________________________________________________________________
 
 
-# loss
+# track loss
 
 Loss = nn.CrossEntropyLoss()
+# set up optimizer for weigh adjustment, using optim.adam from pytorch.
 optimizer = torch.optim.Adam(
     neural_network.parameters(), lr=learning_rate, weight_decay=weight_decay)
 # ____________________________________________________________________________________________________________________________________________________________
@@ -110,11 +112,13 @@ optimizer = torch.optim.Adam(
 train_loss = []
 val_loss = []
 infinite = float("inf")
+
 # --- Early Stopping setup)
 best_validation_loss = infinite  # infite number
 no_improvement = 0
 
 # Training loop
+
 for epoch in range(number_of_epochs):
     training_loss = 0
     correct_prediction = 0
@@ -122,40 +126,43 @@ for epoch in range(number_of_epochs):
 
     for images, labels in training_loader:
         images = images.to(device)
-        labels = labels.to(device)
+        labels = labels.to(device)  # move to device = move to the GPU
 
-        optimizer.zero_grad()
+        optimizer.zero_grad()  # reset gradients
         outputs = neural_network(images)
         loss = Loss(outputs, labels)
-        loss.backward()
-        optimizer.step()
+        loss.backward()  # back propagration  if gradients
+        optimizer.step()  # weight update
 
-        training_loss += loss.item()
+        training_loss += loss.item()  # track training loss
 
-        predicted = outputs.argmax(1)
+        predicted = outputs.argmax(1)  # picks largest number as prediction
+        # see if prediction is correct
         correct_prediction += (predicted == labels).sum().item()
         total_predictions += len(labels)
 
-    average_train_loss = training_loss / len(training_loader)
+    average_train_loss = training_loss / \
+        len(training_loader)  # mean loss and accuracy
     train_loss.append(average_train_loss)
     training_accuracy = 100 * correct_prediction / total_predictions
-
+# ____________________________________________________________________________________________________________________________________________________________
     # Validation loop
-    neural_network.eval()
-    validation_loss = 0
+    neural_network.eval()  # start evaulation
+    validation_loss = 0  # reset statistics for evaluation after each epoch
     validation_correct = 0
     validation_total = 0
 
-    with torch.no_grad():
-        for images, labels in validation_loader:
-            images = images.to(device)
+    with torch.no_grad():  # no gradient computions under validation
+        for images, labels in validation_loader:  # looping though validation folder
+            images = images.to(device)  # to GPU
             labels = labels.to(device)
 
             outputs = neural_network(images)
             loss = Loss(outputs, labels)
             validation_loss += loss.item()
 
-            predicted = outputs.argmax(1)
+            predicted = outputs.argmax(1)  # picks largest number as prediction
+            # see if prediction is correct
             validation_correct += (predicted == labels).sum().item()
             validation_total += len(labels)
 
@@ -169,7 +176,7 @@ for epoch in range(number_of_epochs):
         f"Validation loss = {average_validation_loss:.3f} Validation Accuracy = {validation_accuracy:.3f}")
     print("______________________________________ \n")
 
-    # --- Early Stopping check
+    # Early Stopping check
     if average_validation_loss < best_validation_loss:
 
         best_validation_loss = average_validation_loss
@@ -178,11 +185,10 @@ for epoch in range(number_of_epochs):
         no_improvement += 1
 
     if no_improvement >= patience:
-        # Stop træningen
         print(f"Early stopping activated after {epoch+1} epochs.")
         break
 
-
+# ____________________________________________________________________________________________________________________________________________________________
 # Plot loss functions
 plt.plot(train_loss, label="Training Loss")
 plt.plot(val_loss, label="Validation Loss")
@@ -194,17 +200,16 @@ plt.title("Picture resolution 32x32 : Loss over Epochs")
 plt.legend()
 plt.show()
 
-
-# Testing the neural networks accuracy:
+# ____________________________________________________________________________________________________________________________________________________________
+# Testing the neural networks accuracy: ( pilot study )
 
 # establishing test folder
 test_folder = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/Fruit_classification_data/test"
 
-
 loader = DataLoader(ImageFolder(test_folder, transform=transforms.Compose([
     transforms.Resize([x_size, y_size]), transforms.ToTensor()])), batch_size=32)
 
-neural_network.eval()
+neural_network.eval()  # see validation loop for explanation
 correct = total = 0
 with torch.no_grad():
     for imgs, labels in loader:
@@ -214,8 +219,8 @@ with torch.no_grad():
 
 print(
     f"Accuracy on test-set: {100*correct/total:.2f}% ({correct}/{total} billeder korrekt)")
-
-# Testing the neural networks accuracy: FINAL TEST
+# ____________________________________________________________________________________________________________________________________________________________
+# Testing the neural networks accuracy: FINAL study
 
 # establishing test folder
 final_test_folder = "/Users/noahwestheimer/Documents/1. semester/ITIS 02461/ITIS PROJEKT/Fruits/resolution_test"
@@ -228,9 +233,11 @@ neural_network.eval()
 correct = total = 0
 with torch.no_grad():
     for imgs, labels in loader:
-        predictions = neural_network(imgs.to(device)).argmax(1)
+        predictions = neural_network(imgs.to(device)).argmax(
+            1)  # see validation loop for explanation
         correct += (predictions.cpu() == labels).sum().item()
         total += labels.size(0)
 
 print(
     f"Accuracy on final_test-set: {100*correct/total:.2f}% ({correct}/{total} billeder korrekt)")
+# ____________________________________________________________________________________________________________________________________________________________
